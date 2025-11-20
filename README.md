@@ -1,4 +1,4 @@
-# 📘 Finanzas_Internacionales_UBA_2025  
+# Finanzas_Internacionales_UBA_2025  
 **Crecimiento y Aceleración del Crédito Bancario como Predictores de Crisis Bancarias**  
 Maestría en Economía Aplicada – UBA  
 Autor: **Julián Delgadillo Marín**  
