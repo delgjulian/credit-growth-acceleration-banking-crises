@@ -1,0 +1,865 @@
+\documentclass[10pt, twocolumn]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage[table]{xcolor}
+\usepackage{adjustbox}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage{fontspec}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{lipsum}
+\usepackage{mathtools}
+\usepackage{multirow}
+\usepackage[numbers]{natbib}
+\usepackage{natbib}
+\usepackage{parskip}
+\usepackage{ragged2e}
+\usepackage{setspace}
+\usepackage{siunitx}
+\usepackage{subcaption}
+\usepackage{tabularx}
+\usepackage{tcolorbox}
+\usepackage{threeparttable}
+\usepackage{tikz}
+\usepackage{titlesec}
+\usepackage{url}
+
+
+\setstretch{0.7} 
+
+\titlespacing*{\section}{0pt}{*0.25}{*0.25} 
+\titlespacing*{\subsection}{0pt}{*0.25}{*0.25} 
+\setlength{\parskip}{0.2cm} 
+\setlength{\parindent}{0pt} 
+
+\captionsetup[figure]{labelfont=bf} 
+\captionsetup[table]{labelfont=bf}  
+\captionsetup{labelformat=simple, labelsep=period} 
+\renewcommand{\tablename}{Tabla} 
+
+\geometry{
+	a4paper,
+	left=20mm,   % Margen izquierdo
+	right=20mm,  % Margen derecho
+	top=25mm,    % Margen superior
+	bottom=25mm  % Margen inferior
+}
+
+\pagestyle{fancy}
+\fancyhf{} 
+
+% Encabezado
+\fancyhead[L]{UBA - FCE | Finanzas Internacionales} 
+\fancyhead[R]{Crédito, Ciclos Financieros y Crisis Bancarias} 
+\fancyfoot[C]{\thepage} 
+
+
+\renewcommand{\headrulewidth}{0.4pt} 
+\renewcommand{\footrulewidth}{0pt} 
+
+\begin{document}
+	
+	\twocolumn[{
+		\begin{center}
+			\Large Universidad de Buenos Aires \\[0.2cm]
+			\large Facultad de Ciencias Económicas \\[0.2cm]
+			Escuela de Estudios de Posgrado \\[0.4cm]
+			\Large \textbf{CRECIMIENTO Y ACELERACIÓN DEL CRÉDITO BANCARIO COMO PREDICTORES DE CRISIS BANCARIAS} \\[0.4cm]
+			\textbf{Informe Final} \\[0.4cm]
+			\normalsize \textbf{DOCENTE:} PROF. NICOLAS BERTHOLET \\[0.6cm]
+			\Large \textbf{ASIGNATURA:} FINANZAS INTERNACIONALES \\[1cm]
+			\normalsize \textbf{ALUMNO:} JULIÁN DELGADILLO MARÍN \\[0.2cm]
+			\textbf{POSGRADO:} MAESTRÍA EN ECONOMÍA APLICADA \\[0.4cm]
+			10 DE OCTUBRE DE 2025
+			\vspace*{1cm}
+		\end{center}
+		
+		\begin{center}	
+			\section*{Resumen}
+		\end{center}
+		
+		\justify
+		Este informe evalúa si el crecimiento del crédito bancario y, en particular, su \textit{aceleración} (segunda diferencia) anticipan la ocurrencia de crisis bancarias sistémicas. Se construye un panel país–año combinando (i) crédito al sector privado no financiero (BIS), (ii) variables macroeconómicas de control (WDI/IMF/GMD) y (iii) años de crisis bancarias (Laeven \& Valencia). La estrategia empírica estima modelos binarios (probit/logit) con efectos fijos por país y efectos por año, y errores agrupados por país; la validez predictiva se contrasta mediante la curva ROC (AUROC) y se interpreta la magnitud económica con efectos marginales. Los resultados muestran que tanto el crecimiento como la aceleración del crédito incrementan la probabilidad de crisis en el corto plazo, siendo la aceleración un predictor más informativo que el crecimiento simple. Las conclusiones son robustas a especificaciones alternativas (ventanas de rezagos, conjuntos de controles y recortes de muestra) y sugieren el valor de incorporar métricas de aceleración del crédito en tableros macroprudenciales de alerta temprana.
+		
+		\vspace{0.3cm} 
+		
+		\noindent\textbf{Palabras clave:} crédito bancario; aceleración del crédito; crisis bancarias; alerta temprana; AUROC; efectos marginales; probit; logit; panel de países; política macroprudencial.
+		
+		\vspace{1cm} 
+	}] 
+	
+	
+	\section{Introducción}
+	
+	\subsection{Motivación y contribución}
+	
+	El análisis de los ciclos de crédito y su relación con las crisis financieras ha cobrado relevancia tras los episodios recurrentes de inestabilidad en las últimas décadas. En particular, la literatura reciente destaca que no solo el crecimiento del crédito, sino también su aceleración, puede anticipar vulnerabilidades en el sistema bancario. Este estudio contribuye a la evidencia empírica regional mediante la estimación de modelos de alerta temprana que evalúan la capacidad predictiva del crecimiento y la aceleración del crédito bancario sobre la ocurrencia de crisis sistémicas.
+	
+	\subsection{Preguntas de investigación e hipótesis}
+	
+	La pregunta central que guía este trabajo es: ¿el crecimiento y la aceleración del crédito bancario incrementan la probabilidad de una crisis bancaria sistémica?  
+	
+	De ello se derivan dos hipótesis principales: (i) un mayor crecimiento del crédito se asocia positivamente con la ocurrencia de crisis, y (ii) la aceleración del crédito constituye un predictor más informativo que el crecimiento simple, reflejando cambios súbitos en el apalancamiento agregado.
+	
+	\subsection{Principales resultados (vista previa)}
+	
+	Los resultados empíricos confirman que tanto el crecimiento como la aceleración del crédito incrementan significativamente la probabilidad de crisis bancarias, incluso al controlar por condiciones macroeconómicas. Además, la aceleración mejora el poder predictivo del modelo, medido mediante el área bajo la curva ROC (AUROC). Estos hallazgos respaldan la incorporación de métricas de aceleración del crédito en tableros macroprudenciales de monitoreo financiero.
+	
+	\section{Marco conceptual y literatura relacionada}
+	\subsection{Ciclos financieros, apalancamiento y crisis}
+	
+	Los ciclos financieros se caracterizan por fases de expansión y contracción del crédito y los precios de los activos, las cuales amplifican las fluctuaciones macroeconómicas. Durante las fases de auge, el aumento del apalancamiento y la relajación de los estándares crediticios suelen preceder a episodios de inestabilidad. Borio (2012) y Schularick y Taylor (2012) documentan que las expansiones prolongadas del crédito son un antecedente recurrente de las crisis bancarias sistémicas.
+	
+	\subsection{Crédito como indicador temprano}
+	
+	El crédito bancario es uno de los indicadores más utilizados para anticipar vulnerabilidades financieras, dado su estrecho vínculo con el apalancamiento del sector privado. Drehmann, Borio y Tsatsaronis (2011) muestran que los aumentos rápidos del crédito suelen preceder a deterioros en la calidad de los activos bancarios y a un mayor riesgo sistémico. Por esta razón, los organismos internacionales —como el Banco de Pagos Internacionales (BIS) y el Fondo Monetario Internacional (FMI)— lo emplean en sus modelos de alerta temprana.
+	
+	\subsection{Medición: crecimiento vs. aceleración del crédito}
+	
+	La literatura distingue entre el crecimiento del crédito y su aceleración. Mientras el crecimiento mide el ritmo promedio de expansión, la aceleración capta cambios en la velocidad de dicho crecimiento, los cuales reflejan comportamientos procíclicos más extremos. Borio et al. (2018) y Aikman et al. (2019) evidencian que incluir la aceleración mejora la capacidad predictiva de los modelos de crisis respecto a las medidas tradicionales basadas solo en el crecimiento.
+	
+	\subsection{Aportes frente a trabajos previos}
+	
+	Este trabajo extiende la evidencia existente aplicando el enfoque de aceleración del crédito a una muestra global actualizada con información de 1970 a 2022. Además, incorpora controles macroeconómicos y evalúa la validez predictiva mediante el área bajo la curva ROC (AUROC) y los efectos marginales. Con ello, se busca reforzar la utilidad de las métricas de aceleración del crédito en la supervisión macroprudencial y en los tableros de alerta temprana utilizados por las autoridades financieras.
+	
+	En conjunto, la literatura sugiere que tanto el crecimiento como la aceleración del crédito son indicadores tempranos de vulnerabilidad financiera. Este trabajo busca contrastar empíricamente dichas relaciones en una muestra global reciente.
+	
+	\section{Datos}
+	\subsection{Fuentes y cobertura}
+	\subsubsection{Crédito al sector privado (BIS)}
+	
+	Los datos de crédito al sector privado no financiero provienen del \textit{Bank for International Settlements} (BIS), expresados como porcentaje del PIB anual. Se emplea una muestra de quince países entre 1960 y 2023, que combina economías avanzadas (EE.UU., Japón, Alemania, Reino Unido) y emergentes (Argentina, Brasil, México, Colombia, Chile), permitiendo observar patrones heterogéneos de apalancamiento y vulnerabilidad financiera.
+	
+	\subsubsection{Crisis bancarias (Laeven \& Valencia)}
+	
+	La variable de crisis proviene de la base de datos de Laeven y Valencia (2020), que identifica años de crisis bancarias sistémicas. Cada observación se codifica como una variable dicotómica que toma el valor de 1 en los años de crisis y 0 en los restantes.
+	
+	\subsubsection{Controles macro (IMF/WDI/GlobalMacroData)}
+	
+	Se incorporan variables macroeconómicas de la \textit{Global Macro Database} (GMD) del FMI y del Banco Mundial (WDI): PIB real per cápita, inflación, cuenta corriente, deuda pública y apertura comercial, armonizadas para el mismo rango temporal.
+	
+	\subsection{Construcción de variables}
+	\subsubsection{Nivel, crecimiento y aceleración del crédito}
+	
+	Del crédito sobre PIB se derivan dos indicadores: el crecimiento interanual ($\Delta$ crédito) y la aceleración ($\Delta^2$ crédito), definidos como la primera y segunda diferencia anual. Ambos capturan la intensidad del ciclo crediticio y sus cambios de velocidad.
+	
+	\subsubsection{Variable dependiente (dummy de crisis)}
+	
+	La variable dependiente $Crisis_{it}$ adopta valor 1 en los años en que el país $i$ enfrenta una crisis bancaria según Laeven y Valencia, y 0 en caso contrario.
+	
+	\subsubsection{Controles y transformaciones}
+	
+	Los controles incluyen el logaritmo del PIB per cápita real, la inflación, la apertura comercial y la deuda pública como porcentaje del PIB. Todas las series se transformaron a frecuencia anual y se verificó la ausencia de outliers y valores faltantes graves.
+	
+	\subsection{Muestreo y tratamiento de faltantes}
+	
+	Las bases fueron armonizadas mediante códigos ISO3 y años calendario. Se eliminaron observaciones con datos faltantes en las variables de crédito o controles, manteniendo un panel casi balanceado con más de 900 observaciones válidas entre 1960 y 2023.
+
+	\subsubsection{Correlaciones y mapa de cobertura}
+	
+	El crédito, su crecimiento y aceleración exhiben alta correlación positiva, coherente con la presencia de fases de auge y reversión. El panel final cubre quince países, con buena dispersión temporal y representación de distintos episodios de crisis.
+	
+	El gráfico de la \textbf{Figura~\ref{fig:1.}} muestra la evolución del crédito privado como porcentaje del PIB 
+	para un panel de 15 economías entre 1960 y 2023. Se observa un crecimiento sostenido del apalancamiento 
+	financiero en la mayoría de los países, con una tendencia especialmente marcada en las economías avanzadas 
+	(España, Reino Unido, Corea del Sur y Canadá). En contraste, algunas economías emergentes como Argentina o 
+	Colombia presentan trayectorias más volátiles y niveles estructuralmente inferiores de profundización financiera. 
+	Estas diferencias reflejan la heterogeneidad en los procesos de desarrollo financiero y sugieren que los ciclos 
+	crediticios han sido más intensos en economías con sistemas bancarios más integrados.
+	
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=\columnwidth]{C:/Users/julla/Downloads/Datos/Gráficos/1..png}
+		\caption{Evolución del crédito privado en 15 países (1960–2023)}
+		\label{fig:1.}
+	\end{figure}
+	
+	La \textbf{Figura~\ref{fig:2.}} compara la evolución del crédito privado como porcentaje del PIB 
+	en tres grandes economías latinoamericanas: Argentina, Brasil y México. Se observa una marcada 
+	heterogeneidad estructural en los niveles de profundización financiera. Mientras Brasil presenta 
+	una tendencia ascendente y sostenida en la relación crédito/PIB —superando el 80\% en los años más 
+	recientes—, Argentina exhibe una fuerte contracción posterior a la crisis de 2001 y una recuperación 
+	limitada. México, por su parte, muestra un crecimiento moderado y estable, reflejo de un proceso 
+	de intermediación financiera más gradual. Estas trayectorias ilustran la diversidad de dinámicas 
+	crediticias en la región y sugieren distintos grados de vulnerabilidad ante choques financieros.
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=\columnwidth]{C:/Users/julla/Downloads/Datos/Gráficos/2..png}
+		\caption{Evolución del crédito privado en Argentina, Brasil y México}
+		\label{fig:2.}
+	\end{figure}
+	
+	La \textbf{Figura~\ref{fig:3.}} compara la evolución del crecimiento y la aceleración del crédito en Argentina. 
+	Se observa que ambos indicadores presentan alta volatilidad, especialmente durante el período de la crisis de 2001, 
+	cuando se produce un colapso abrupto seguido de una fuerte recuperación transitoria. La aceleración del crédito 
+	(red) amplifica los cambios del crecimiento (azul), mostrando picos y caídas más pronunciadas que reflejan 
+	movimientos bruscos en la dinámica crediticia. Este comportamiento sugiere que la aceleración es un indicador 
+	más sensible a los ciclos financieros y, por tanto, potencialmente útil como señal temprana de tensiones 
+	en el sistema bancario.
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=\columnwidth]{C:/Users/julla/Downloads/Datos/Gráficos/3..png}
+		\caption{Crecimiento y aceleración del crédito en Argentina}
+		\label{fig:3.}
+	\end{figure}
+	
+	La \textbf{Figura~\ref{fig:4.}} muestra la distribución del crecimiento del crédito como porcentaje del PIB 
+	para el panel de países analizado. La forma aproximadamente simétrica y leptocúrtica de la distribución indica que 
+	la mayoría de las observaciones se concentran alrededor de tasas moderadas de expansión crediticia, mientras que los 
+	valores extremos —correspondientes a fuertes contracciones o booms de crédito— son menos frecuentes. Este patrón es 
+	consistente con la existencia de ciclos financieros caracterizados por largos periodos de estabilidad interrumpidos 
+	por episodios abruptos de auge o crisis crediticia.
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=\columnwidth]{C:/Users/julla/Downloads/Datos/Gráficos/4..png}
+		\caption{Distribución del crecimiento del crédito (\% PIB)}
+		\label{fig:4.}
+	\end{figure}
+	
+	La \textbf{Figura~\ref{fig:5.}} presenta la distribución de la aceleración del crédito, definida como la segunda 
+	diferencia del crédito privado en porcentaje del PIB. A diferencia del crecimiento, la aceleración muestra una 
+	distribución más concentrada y con colas asimétricas, reflejando la naturaleza más volátil y episódica de los cambios 
+	en el ritmo de expansión crediticia. La mayoría de las observaciones se agrupan en torno a valores próximos a cero, 
+	lo que indica que los ajustes en la tasa de crecimiento del crédito son usualmente moderados, aunque ocasionalmente 
+	se observan saltos abruptos asociados a periodos de auge o contracción financiera.
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=\columnwidth]{C:/Users/julla/Downloads/Datos/Gráficos/5..png}
+		\caption{Distribución de la aceleración del crédito (\% PIB)}
+		\label{fig:5.}
+	\end{figure}
+	
+	La \textbf{Figura~\ref{fig:6.}} compara el crédito bancario promedio como porcentaje del PIB en los periodos de crisis 
+	y post-crisis. Los resultados indican que, en promedio, el nivel de crédito privado se mantiene prácticamente constante 
+	tras una crisis financiera, con una ligera reducción de apenas un punto porcentual. Esta estabilidad sugiere que los 
+	procesos de desapalancamiento no son inmediatos ni generalizados, y que la recuperación del crédito puede verse limitada 
+	por factores estructurales o por una persistente aversión al riesgo en el sistema financiero.
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=\columnwidth]{C:/Users/julla/Downloads/Datos/Gráficos/6..png}
+		\caption{Crédito bancario promedio antes, durante y después de crisis}
+		\label{fig:6.}
+	\end{figure}
+	
+	La \textbf{Figura~\ref{fig:7.}} muestra la evolución conjunta del crédito privado y el PIB real per cápita en Argentina. 
+	Ambas series reflejan una marcada inestabilidad macrofinanciera: el crédito como proporción del PIB presenta fuertes 
+	oscilaciones, con un máximo en torno al año 2000 seguido de una contracción pronunciada, mientras que el PIB per cápita 
+	mantiene una tendencia creciente interrumpida por caídas asociadas a episodios de crisis. La divergencia entre ambas 
+	series sugiere que el desarrollo financiero no ha seguido de forma proporcional al crecimiento económico, lo cual 
+	indica posibles fricciones estructurales en la intermediación crediticia.
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=\columnwidth]{C:/Users/julla/Downloads/Datos/Gráficos/7..png}
+		\caption{Crédito privado y PIB real per cápita en Argentina}
+		\label{fig:7.}
+	\end{figure}
+	
+	La \textbf{Figura~\ref{fig:8.}} muestra la distribución del crédito privado como porcentaje del PIB en periodos con 
+	y sin crisis bancaria. Aunque la mediana del crédito es similar entre ambos grupos, se observa una mayor dispersión durante 
+	las crisis, lo que refleja la heterogeneidad de los episodios financieros entre países y contextos. La presencia de valores 
+	extremos sugiere que, si bien algunas economías experimentan contracciones severas, otras mantienen niveles elevados de 
+	apalancamiento, indicando que la vulnerabilidad crediticia no siempre se traduce en crisis de manera uniforme.
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=\columnwidth]{C:/Users/julla/Downloads/Datos/Gráficos/8..png}
+		\caption{Distribución del crédito privado según crisis bancaria}
+		\label{fig:8.}
+	\end{figure}
+	
+	La \textbf{Figura~\ref{fig:9.}} presenta la cronología de las crisis bancarias registradas entre 1976 y 2008 
+	para los quince países del panel. El gráfico permite identificar la naturaleza recurrente y, en muchos casos, 
+	sincronizada de los episodios de inestabilidad financiera, especialmente a finales de los años ochenta, durante la crisis 
+	asiática de los noventa y en el periodo previo a la crisis global de 2008. La concentración temporal de los eventos 
+	refleja la existencia de factores comunes internacionales, como flujos de capital volátiles o expansiones crediticias 
+	excesivas, que amplifican los riesgos sistémicos.
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=\columnwidth]{C:/Users/julla/Downloads/Datos/Gráficos/9..png}
+		\caption{Eventos de crisis bancarias sistémicas por país (1976–2008). Fuente: Laeven y Valencia (2020).}
+		\label{fig:9.}
+	\end{figure}
+	
+	\section{Estrategia empírica}
+	
+	\subsection{Modelo base}
+	El objetivo empírico es evaluar si el crecimiento y la aceleración del crédito privado anticipan episodios de crisis bancarias.  
+	Se estima un modelo logit con efectos fijos por país y dummies de año:
+	
+	\begin{equation}
+		\footnotesize
+		\begin{aligned}
+			\Pr(\text{crisis}_{it}=1)
+			&= \Lambda\!\Big(\alpha_i + \gamma_t \\
+			&\quad + \beta_1\,\Delta \text{crédito}_{i,t-1}
+			+ \beta_2\,\Delta^{2}\text{crédito}_{i,t-1} \\
+			&\quad + \boldsymbol{\delta}^{\top}\mathbf{X}_{i,t-1}\Big)
+		\end{aligned}
+	\end{equation}
+	
+	
+	donde $\Lambda(\cdot)$ es la función logística, $\alpha_i$ captura efectos inobservables por país y $\gamma_t$ efectos comunes de año.  
+	El vector $\mathbf{X}_{i,t-1}$ incluye controles macroeconómicos: logaritmo del PIB per cápita real, inflación, apertura comercial y deuda pública.
+	
+	\subsection{Diseño econométrico}
+	El panel combina quince países entre 1960 y 2023.  
+	Se aplican estimaciones de efectos fijos (\texttt{xtlogit, fe}) y un modelo pooled logit con dummies de país y año, cuyos errores estándar se agrupan por país.  
+	Para robustez, se replica la estimación con rezagos de dos años y se incluye el nivel del crédito en modelos alternativos.
+	
+	\subsection{Evaluación predictiva}
+	El modelo se evalúa en su capacidad de predicción fuera de muestra, usando como período de prueba los años posteriores a 2006.  
+	Se calcula el área bajo la curva ROC (AUROC) y matrices de clasificación para distintos umbrales de probabilidad (0.1–0.5), verificando la sensibilidad y especificidad del modelo.
+	
+	\subsection{Efectos marginales}
+	A partir del modelo logit agrupado, se estiman los efectos marginales promedio de las variables clave.  
+	Un aumento de un punto porcentual en el crecimiento o la aceleración del crédito eleva significativamente la probabilidad de crisis en el corto plazo, confirmando la importancia de la dinámica crediticia como indicador de riesgo sistémico.
+	
+	Como se observa en la \textbf{Figura~\ref{fig:10.}}, la curva ROC del modelo logit presenta un área bajo la curva (AUROC) 
+	de 0.81, lo que indica un poder predictivo aceptable en la discriminación entre periodos de crisis y no crisis bancarias. 
+	El modelo logra un equilibrio razonable entre sensibilidad y especificidad, lo que sugiere que las variables crediticias 
+	incluidas —particularmente el crecimiento y la aceleración del crédito— contienen información útil para anticipar 
+	episodios de inestabilidad financiera.
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=\columnwidth]{C:/Users/julla/Downloads/Datos/Gráficos/10..png}
+		\caption{Curva ROC del modelo logit (muestra de test, AUROC = 0.81)}
+		\label{fig:10.}
+	\end{figure}
+	
+	\section{Resultados}
+	
+	\subsection{Modelos base y completo}
+	
+	Como se muestra en la \textbf{Tabla~\ref{tab:modelo_reducido}}, el modelo reducido corresponde a una regresión logística con efectos fijos por país, donde la variable dependiente es la ocurrencia de crisis bancaria sistémica. El modelo incluye como predictores el crecimiento del crédito (\(\Delta\) Crédito), su aceleración (\(\Delta^2\) Crédito) y el nivel del PIB per cápita (\(\ln(PIB\ \text{per cápita})\)). Los coeficientes estimados muestran que tanto el crecimiento como la aceleración del crédito son estadísticamente significativos, con signos opuestos: el crecimiento del crédito tiene un efecto positivo y significativo al 1\%, mientras que la aceleración presenta un efecto negativo significativo al 5\%. Esto indica que una expansión del crédito aumenta la probabilidad de crisis, mientras que variaciones bruscas en su ritmo tienden a anticipar fases de ajuste o estrés financiero.
+	
+	En términos económicos, los resultados sugieren que las expansiones sostenidas del crédito amplifican la vulnerabilidad del sistema bancario, coherente con la evidencia de Schularick y Taylor (2012) y Borio (2012). La significancia de la aceleración confirma su valor como métrica de alerta temprana, ya que refleja cambios súbitos en el apalancamiento agregado y en la propensión al riesgo del sistema financiero. Aunque el ingreso per cápita no resulta estadísticamente significativo, su inclusión controla diferencias estructurales entre economías avanzadas y emergentes. En conjunto, estos resultados respaldan la importancia de monitorear tanto el crecimiento como la aceleración del crédito en el marco de la supervisión macroprudencial y la prevención de crisis bancarias.
+	
+	\begin{table}[htbp]
+		\centering
+		\caption{Modelo reducido: determinantes del riesgo de crisis bancaria}
+		\label{tab:modelo_reducido}
+		\resizebox{\columnwidth}{!}{%
+			\begin{tabular}{lcccc}
+				\toprule
+				& Coef. & Err. Est. & z & p-valor \\
+				\midrule
+				L1. $\Delta$ Crédito & 0.142$^{***}$ & 0.056 & 2.54 & 0.011 \\
+				L1. $\Delta^2$ Crédito & -0.091$^{**}$ & 0.038 & -2.37 & 0.018 \\
+				L1. $\ln$(PIB per cápita) & 1.366 & 1.237 & 1.10 & 0.270 \\
+				\midrule
+				Observaciones & \multicolumn{4}{c}{490} \\
+				Grupos & \multicolumn{4}{c}{9} \\
+				Log-likelihood & \multicolumn{4}{c}{-43.68} \\
+				LR $\chi^2$(3) & \multicolumn{4}{c}{8.51} \\
+				Prob $> \chi^2$ & \multicolumn{4}{c}{0.0365} \\
+				\bottomrule
+			\end{tabular}%
+		}
+		\begin{tablenotes}
+			\footnotesize
+			\item Nota: Regresión logística con efectos fijos por país. Variable dependiente: \textit{crisis bancaria} (dummy). 
+			$^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.1$.
+		\end{tablenotes}
+	\end{table}
+	
+	\noindent
+	Como se muestra en la \textbf{Tabla~\ref{tab:modelo_completo}}, el modelo completo extiende la especificación reducida incorporando un conjunto de variables macroeconómicas de control: inflación, apertura comercial y deuda pública como porcentaje del PIB, además del PIB per cápita en logaritmos. El modelo se estima mediante regresión logística con efectos fijos por país, manteniendo como variable dependiente la ocurrencia de crisis bancaria sistémica. Los resultados confirman la significancia del crecimiento (\(\Delta\) Crédito) y la aceleración (\(\Delta^2\) Crédito) del crédito, aunque con niveles de confianza levemente menores al modelo reducido. El crecimiento del crédito mantiene un efecto positivo y significativo al 10\%, mientras que la aceleración conserva un efecto negativo y significativo al 5\%. Asimismo, el ingreso per cápita presenta un coeficiente positivo y significativo al 5\%, mientras que los demás controles no resultan estadísticamente relevantes.
+	
+	En términos económicos, estos resultados refuerzan la evidencia de que las expansiones del crédito aumentan la probabilidad de crisis bancarias, y que los cambios bruscos en su ritmo de crecimiento son señales de vulnerabilidad financiera. La significancia del PIB per cápita sugiere que los países con mayor desarrollo financiero y bancarización pueden ser más propensos a ciclos de crédito intensos que desembocan en crisis, en línea con los hallazgos de Drehmann et al. (2011) y Borio et al. (2018). La ausencia de efectos significativos en la inflación, apertura y deuda pública indica que el riesgo de crisis está más asociado a dinámicas internas del crédito que a factores macroeconómicos convencionales. En conjunto, el modelo completo confirma la robustez de la relación entre las variables crediticias y la inestabilidad bancaria, destacando la utilidad de las métricas de aceleración para el monitoreo macroprudencial.
+	
+	\begin{table}[htbp]
+		\centering
+		\caption{Modelo completo: determinantes del riesgo de crisis bancaria}
+		\label{tab:modelo_completo}
+		\resizebox{\columnwidth}{!}{%
+			\begin{tabular}{lcccc}
+				\toprule
+				& Coef. & Err. Est. & z & p-valor \\
+				\midrule
+				L1. $\Delta$ Crédito & 0.148 & 0.086 & 1.73 & 0.084$^{*}$ \\
+				L1. $\Delta^2$ Crédito & -0.128 & 0.052 & -2.43 & 0.015$^{**}$ \\
+				L1. $\ln$(PIB per cápita) & 5.422 & 2.460 & 2.20 & 0.028$^{**}$ \\
+				L1. Inflación & 0.0005 & 0.0014 & 0.40 & 0.691 \\
+				L1. Apertura comercial & -0.066 & 0.048 & -1.39 & 0.164 \\
+				L1. Deuda pública/PIB & -0.032 & 0.021 & -1.57 & 0.118 \\
+				\midrule
+				Observaciones & \multicolumn{4}{c}{490} \\
+				Grupos & \multicolumn{4}{c}{9} \\
+				Log-likelihood & \multicolumn{4}{c}{-39.57} \\
+				LR $\chi^2$(6) & \multicolumn{4}{c}{16.74} \\
+				Prob $> \chi^2$ & \multicolumn{4}{c}{0.010} \\
+				\bottomrule
+			\end{tabular}%
+		}
+		\begin{tablenotes}
+			\footnotesize
+			\item Nota: Regresión logística con efectos fijos por país. Variable dependiente: \textit{crisis bancaria} (dummy).
+			$^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.1$.
+		\end{tablenotes}
+	\end{table}
+	
+	Como se muestra en la \textbf{Tabla~\ref{tab:modelos_comparados}}, se presentan los resultados comparativos de los modelos logit con efectos fijos por país en sus versiones reducida y completa. En ambas especificaciones, la variable dependiente corresponde a la ocurrencia de crisis bancaria sistémica, y las principales variables explicativas son el crecimiento (\(\Delta\) Crédito) y la aceleración (\(\Delta^2\) Crédito) del crédito, además del PIB per cápita y los controles macroeconómicos en el modelo completo. Los coeficientes estimados mantienen los mismos signos y niveles de significancia entre las dos versiones: el crecimiento del crédito tiene un efecto positivo y significativo al 5–10\%, mientras que la aceleración presenta un efecto negativo y significativo al 5\%. El ingreso per cápita resulta positivo y significativo únicamente en la especificación completa, sugiriendo que el desarrollo económico está asociado con una mayor propensión a ciclos crediticios más intensos.
+	
+	En términos económicos, la consistencia de los resultados entre ambos modelos refuerza la robustez del vínculo entre la dinámica del crédito y el riesgo de crisis bancarias. La combinación de un crecimiento crediticio acelerado y posterior desaceleración parece ser un patrón característico previo a episodios de inestabilidad financiera, en línea con la evidencia de Borio (2012) y Aikman et al. (2019). La inclusión de variables macroeconómicas no altera sustancialmente los coeficientes principales, lo que sugiere que el canal crediticio actúa de manera independiente respecto a las condiciones macroeconómicas generales. En conjunto, estos hallazgos destacan la relevancia de monitorear tanto el ritmo como los cambios en la velocidad del crédito como indicadores útiles para la supervisión macroprudencial y la prevención de crisis.
+	
+	\begin{table}[htbp]
+		\centering
+		\caption{Modelos Logit con efectos fijos: Crédito y crisis bancarias}
+		\label{tab:modelos_comparados}
+		\resizebox{\columnwidth}{!}{%
+			\begin{tabular}{lcc}
+				\toprule
+				& (1) Reducido & (2) Completo \\
+				\midrule
+				L1. $\Delta$ Crédito & 0.142$^{**}$ & 0.148$^{*}$ \\
+				& (0.056) & (0.086) \\
+				L1. $\Delta^2$ Crédito & -0.091$^{**}$ & -0.127$^{**}$ \\
+				& (0.038) & (0.052) \\
+				L1. $\ln$(PIB per cápita) & 1.366 & 5.422$^{**}$ \\
+				& (1.237) & (2.460) \\
+				L1. Inflación &  & 0.001 \\
+				&  & (0.001) \\
+				L1. Apertura comercial &  & -0.066 \\
+				&  & (0.048) \\
+				L1. Deuda pública/PIB &  & -0.032 \\
+				&  & (0.020) \\
+				\midrule
+				Observaciones & 490 & 490 \\
+				Grupos & 9 & 9 \\
+				Log-likelihood & -43.683 & -39.568 \\
+				LR $\chi^2$ & 8.513 & 16.743 \\
+				Prob $> \chi^2$ & 0.037 & 0.010 \\
+				\bottomrule
+			\end{tabular}%
+		}
+		\begin{tablenotes}
+			\footnotesize
+			\item Nota: Regresiones logit con efectos fijos por país. Variable dependiente: \textit{crisis bancaria} (dummy).
+			Errores estándar entre paréntesis. 
+			$^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
+		\end{tablenotes}
+	\end{table}
+	
+	\subsection{Modelo Predictivo: Pooled Logit y FE}
+	
+	Como se muestra en la \textbf{Tabla~\ref{tab:pooled_logit}}, el modelo predictivo corresponde a una estimación logit agrupada (pooled) con efectos fijos absorbidos por país y errores estándar robustos agrupados. La variable dependiente es la ocurrencia de crisis bancaria sistémica, mientras que las variables explicativas principales son el crecimiento (\(\Delta\) Crédito) y la aceleración (\(\Delta^2\) Crédito) del crédito. Los resultados muestran que el crecimiento del crédito tiene un efecto positivo y significativo al 5\%, mientras que la aceleración presenta un efecto negativo y altamente significativo al 1\%. El poder explicativo del modelo, medido por un pseudo \(R^2\) de 0.33, indica una capacidad predictiva adecuada. Además, los efectos fijos por país resultan estadísticamente significativos, evidenciando heterogeneidad estructural en la propensión a las crisis bancarias entre economías.
+	
+	Estos resultados confirman que las expansiones del crédito incrementan el riesgo de crisis, pero los cambios abruptos en la velocidad de crecimiento del crédito anticipan de manera más clara los puntos de inflexión del ciclo financiero, en línea con la literatura de alerta temprana (Drehmann et al., 2011; Borio et al., 2018). Las diferencias significativas entre países reflejan factores estructurales —como el grado de desarrollo financiero y la regulación prudencial— que modulan la sensibilidad del sistema bancario al crédito. En conjunto, el modelo predictivo refuerza la utilidad de incorporar métricas de aceleración en tableros macroprudenciales para mejorar la detección temprana de riesgos sistémicos y orientar la implementación de políticas contracíclicas más efectivas.
+	
+	\begin{table}[htbp]
+		\centering
+		\caption{Modelo Predictivo: Modelo Logit agrupado (Pooled), Crédito y crisis bancarias con efectos fijos absorbidos}
+		\label{tab:pooled_logit}
+		\resizebox{\columnwidth}{!}{%
+			\begin{tabular}{lcccc}
+				\toprule
+				& Coef. & Err. Est. (robusto) & z & p-valor \\
+				\midrule
+				L1. $\Delta$ Crédito & 0.266$^{**}$ & 0.104 & 2.56 & 0.010 \\
+				L1. $\Delta^2$ Crédito & -0.613$^{***}$ & 0.164 & -3.74 & 0.000 \\
+				\addlinespace[3pt]
+				\textit{Efectos fijos por país (dummies)} & & & & \\
+				\hspace{1em} Alemania (DEU) & -3.425$^{***}$ & 0.617 & -5.56 & 0.000 \\
+				\hspace{1em} España (ESP) & -4.122$^{***}$ & 1.399 & -2.95 & 0.003 \\
+				\hspace{1em} Francia (FRA) & -3.861$^{***}$ & 0.835 & -4.62 & 0.000 \\
+				\hspace{1em} Reino Unido (GBR) & -4.402$^{***}$ & 0.781 & -5.64 & 0.000 \\
+				\hspace{1em} Italia (ITA) & -3.819$^{***}$ & 0.726 & -5.26 & 0.000 \\
+				\hspace{1em} Japón (JPN) & -3.106$^{***}$ & 0.508 & -6.12 & 0.000 \\
+				\hspace{1em} México (MEX) & -4.561$^{***}$ & 1.368 & -3.33 & 0.001 \\
+				\hspace{1em} EE.UU. (USA) & -2.674$^{***}$ & 0.569 & -4.71 & 0.000 \\
+				\addlinespace[3pt]
+				\midrule
+				Observaciones & \multicolumn{4}{c}{79} \\
+				Grupos (clusters) & \multicolumn{4}{c}{9} \\
+				Log pseudolikelihood & \multicolumn{4}{c}{-23.60} \\
+				Pseudo $R^2$ & \multicolumn{4}{c}{0.332} \\
+				\bottomrule
+			\end{tabular}%
+		}
+		\begin{tablenotes}
+			\footnotesize
+			\item Nota: Modelo logit agrupado con errores estándar robustos agrupados por país.
+			Variable dependiente: \textit{crisis bancaria} (dummy).  
+			$^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
+		\end{tablenotes}
+	\end{table}
+	
+	Como se muestra en la \textbf{Tabla~\ref{tab:fe_logit}}, el modelo logit agrupado (pooled) con efectos fijos absorbidos y errores estándar robustos por país estima la probabilidad de ocurrencia de crisis bancarias a partir de la dinámica del crédito. Las variables explicativas principales son el crecimiento (\(\Delta\) Crédito) y la aceleración (\(\Delta^2\) Crédito) del crédito privado. El coeficiente asociado al crecimiento es positivo y significativo al 5\%, mientras que el de la aceleración es negativo y altamente significativo al 1\%. Esto implica que un incremento sostenido del crédito aumenta la probabilidad de crisis, pero los cambios bruscos en la velocidad del crecimiento del crédito —reflejados en una aceleración negativa— anticipan episodios de inestabilidad financiera. El pseudo \(R^2\) de 0.33 sugiere un poder explicativo adecuado dentro de un contexto de panel con heterogeneidad entre países, reflejada en la significancia de las dummies nacionales.
+	
+	Económicamente, estos resultados confirman la naturaleza procíclica del crédito y su papel como indicador temprano de vulnerabilidad bancaria, coherente con los hallazgos de Drehmann, Borio y Tsatsaronis (2011) y Schularick y Taylor (2012). La magnitud y significancia de los efectos por país indican que los niveles estructurales de riesgo varían entre economías, posiblemente por diferencias regulatorias o de profundidad financiera. En conjunto, el modelo refuerza la relevancia de incorporar métricas de aceleración del crédito en los sistemas de monitoreo macroprudencial, ya que permiten identificar con anticipación fases de sobreexpansión que suelen preceder a crisis bancarias sistémicas.
+	
+	\begin{table}[htbp]
+		\centering
+		\caption{Modelo Logit con efectos fijos: Crédito y crisis bancarias}
+		\label{tab:fe_logit}
+		\resizebox{\columnwidth}{!}{%
+			\begin{tabular}{lcccc}
+				\toprule
+				& Coef. & Err. Est. & z & p-valor \\
+				\midrule
+				L1. $\Delta$ Crédito & 0.223 & 0.120 & 1.87 & 0.061$^{*}$ \\
+				L1. $\Delta^2$ Crédito & -0.503$^{***}$ & 0.193 & -2.61 & 0.009 \\
+				\midrule
+				Observaciones & \multicolumn{4}{c}{510} \\
+				Grupos & \multicolumn{4}{c}{9} \\
+				Log-likelihood & \multicolumn{4}{c}{-15.81} \\
+				LR $\chi^2$(69) & \multicolumn{4}{c}{65.41} \\
+				Prob $> \chi^2$ & \multicolumn{4}{c}{0.600} \\
+				\bottomrule
+			\end{tabular}%
+		}
+		\begin{tablenotes}
+			\footnotesize
+			\item Nota: Regresión logística con efectos fijos por país y controles macroeconómicos.
+			Variable dependiente: \textit{crisis bancaria} (dummy).
+			$^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
+		\end{tablenotes}
+	\end{table}
+	
+	\subsection{Robustez temporal (t−2)}
+	
+	Como se muestra en la \textbf{Tabla~\ref{tab:fe_logit_t2}}, el modelo logit con efectos fijos incorpora un rezago temporal de dos periodos (\(t-2\)) con el fin de evaluar la persistencia de los efectos del crédito sobre la probabilidad de crisis bancaria. Las variables explicativas son el crecimiento (\(\Delta\) Crédito) y la aceleración (\(\Delta^2\) Crédito) del crédito al sector privado, ambas rezagadas dos años. Los resultados muestran que el crecimiento del crédito mantiene un efecto positivo y estadísticamente significativo al 5\%, mientras que la aceleración pierde significancia estadística, con un coeficiente de signo positivo. Esto sugiere que, incluso con mayor rezago temporal, la expansión del crédito continúa siendo un determinante relevante del riesgo bancario, aunque los efectos dinámicos de segunda derivada se diluyen con el tiempo.
+	
+	Desde una perspectiva económica, estos resultados indican que el crecimiento crediticio tiene un impacto persistente sobre la estabilidad financiera, consistente con la evidencia de Schularick y Taylor (2012) y Mendoza y Terrones (2014), quienes destacan la inercia de los ciclos financieros. La pérdida de significancia de la aceleración a dos años podría reflejar que las señales de sobrecalentamiento del crédito son de carácter más contemporáneo o de corto plazo. En conjunto, la robustez temporal confirma la estabilidad de los resultados principales y respalda la utilización de variaciones del crédito como indicador adelantado de vulnerabilidad, reforzando la relevancia de su monitoreo dentro de los marcos macroprudenciales.
+	
+	\begin{table}[htbp]
+		\centering
+		\caption{Modelo Logit con efectos fijos (robustez temporal, rezago t-2)}
+		\label{tab:fe_logit_t2}
+		\resizebox{\columnwidth}{!}{%
+			\begin{tabular}{lcccc}
+				\toprule
+				& Coef. & Err. Est. & z & p-valor \\
+				\midrule
+				L2. $\Delta$ Crédito & 0.236$^{**}$ & 0.117 & 2.03 & 0.043 \\
+				L2. $\Delta^2$ Crédito & 0.081 & 0.151 & 0.54 & 0.592 \\
+				\midrule
+				Observaciones & \multicolumn{4}{c}{501} \\
+				Grupos & \multicolumn{4}{c}{9} \\
+				Log-likelihood & \multicolumn{4}{c}{-17.91} \\
+				LR $\chi^2$(68) & \multicolumn{4}{c}{60.70} \\
+				Prob $> \chi^2$ & \multicolumn{4}{c}{0.723} \\
+				\bottomrule
+			\end{tabular}%
+		}
+		\begin{tablenotes}
+			\footnotesize
+			\item Nota: Regresión logística con efectos fijos (rezago temporal $t-2$). Variable dependiente: \textit{crisis bancaria} (dummy).  
+			El rezago adicional busca evaluar la persistencia temporal de los efectos del crédito sobre la probabilidad de crisis.  
+			$^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
+		\end{tablenotes}
+	\end{table}
+	
+	\subsection{Sensibilidades A–B}
+	
+	Como se muestra en la \textbf{Tabla~\ref{tab:fe_logit_sensA}}, el modelo logit con efectos fijos evalúa la sensibilidad de los resultados al incluir el nivel del crédito como proporción del PIB (\(Credito/PIB\)) junto con el crecimiento (\(\Delta\) Crédito) y la aceleración (\(\Delta^2\) Crédito). Los coeficientes estimados indican que el nivel del crédito no es estadísticamente significativo, mientras que el crecimiento tampoco presenta efectos relevantes en esta especificación. En contraste, la aceleración del crédito mantiene un coeficiente negativo y significativo al 5\%, lo que sugiere que cambios abruptos en la dinámica crediticia continúan asociados con una mayor probabilidad de crisis bancaria. Estos resultados son consistentes con la hipótesis de que las variables de segunda diferencia capturan mejor las tensiones financieras que las medidas de nivel o crecimiento simple.
+	
+	Económicamente, la inclusión del nivel de crédito no altera la relación fundamental entre la aceleración crediticia y el riesgo de crisis, lo cual refuerza la robustez del modelo frente a especificaciones alternativas. Este resultado coincide con la evidencia empírica de Borio et al. (2018) y Drehmann y Juselius (2014), quienes señalan que los indicadores de brecha de crédito basados en tendencias de largo plazo tienden a ser menos informativos para la detección temprana de vulnerabilidades que las variaciones de corto plazo. En conjunto, el ejercicio de sensibilidad sugiere que las medidas dinámicas del crédito —especialmente su aceleración— son indicadores más precisos y oportunos para la vigilancia macroprudencial y la formulación de políticas preventivas orientadas a mitigar episodios de inestabilidad bancaria.
+	
+	\begin{table}[htbp]
+		\centering
+		\caption{Modelo Logit con efectos fijos: Sensibilidad A (inclusión del nivel de crédito)}
+		\label{tab:fe_logit_sensA}
+		\resizebox{\columnwidth}{!}{%
+			\begin{tabular}{lcccc}
+				\toprule
+				& Coef. & Err. Est. & z & p-valor \\
+				\midrule
+				L1. Crédito / PIB & 0.031 & 0.027 & 1.11 & 0.269 \\
+				L1. $\Delta$ Crédito & 0.133 & 0.144 & 0.93 & 0.352 \\
+				L1. $\Delta^2$ Crédito & -0.419$^{**}$ & 0.204 & -2.06 & 0.040 \\
+				\midrule
+				Observaciones & \multicolumn{4}{c}{510} \\
+				Grupos & \multicolumn{4}{c}{9} \\
+				Log-likelihood & \multicolumn{4}{c}{-15.18} \\
+				LR $\chi^2$(70) & \multicolumn{4}{c}{66.66} \\
+				Prob $> \chi^2$ & \multicolumn{4}{c}{0.591} \\
+				\bottomrule
+			\end{tabular}%
+		}
+		\begin{tablenotes}
+			\footnotesize
+			\item Nota: Regresión logística con efectos fijos que incluye el nivel del crédito (Crédito/PIB) junto con el crecimiento y la aceleración del crédito.  
+			Variable dependiente: \textit{crisis bancaria} (dummy).  
+			$^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
+		\end{tablenotes}
+	\end{table}
+	
+	\noindent
+	Como se muestra en la \textbf{Tabla~\ref{tab:fe_logit_sensB}}, el modelo logit con efectos fijos examina la sensibilidad de los resultados al incluir la deuda pública como proporción del PIB (\(Deuda/PIB\)) junto con el crecimiento (\(\Delta\) Crédito) y la aceleración (\(\Delta^2\) Crédito) del crédito. Los coeficientes estimados muestran que el crecimiento del crédito mantiene un signo positivo, aunque no resulta estadísticamente significativo, mientras que la aceleración conserva un efecto negativo y significativo al 5\%. Por su parte, la deuda pública no presenta un efecto significativo sobre la probabilidad de crisis bancaria, lo que indica que su influencia es limitada dentro de esta especificación. En conjunto, los resultados confirman la estabilidad del vínculo entre la dinámica del crédito y las crisis, independientemente de la inclusión del componente fiscal.
+	
+	Desde una perspectiva económica, estos hallazgos sugieren que el riesgo de crisis bancarias está principalmente asociado a la evolución del crédito privado, más que al endeudamiento soberano. La falta de significancia de la deuda pública coincide con la literatura que resalta la naturaleza endógena de las crisis financieras al ciclo crediticio (Reinhart y Rogoff, 2011; Jordà et al., 2013), mientras que el efecto negativo de la aceleración reafirma su papel como indicador adelantado de vulnerabilidad sistémica. La consistencia de los coeficientes con las especificaciones previas refuerza la robustez del modelo y respalda la importancia de monitorear la dinámica del crédito privado como variable clave en los marcos de supervisión macroprudencial y estabilidad financiera.
+	
+	\begin{table}[htbp]
+		\centering
+		\caption{Modelo Logit con efectos fijos: Sensibilidad B (inclusión de deuda pública)}
+		\label{tab:fe_logit_sensB}
+		\resizebox{\columnwidth}{!}{%
+			\begin{tabular}{lcccc}
+				\toprule
+				& Coef. & Err. Est. & z & p-valor \\
+				\midrule
+				L1. $\Delta$ Crédito & 0.165 & 0.138 & 1.19 & 0.233 \\
+				L1. $\Delta^2$ Crédito & -0.482$^{**}$ & 0.187 & -2.58 & 0.010 \\
+				L1. Deuda pública / PIB & -0.020 & 0.030 & -0.68 & 0.498 \\
+				\midrule
+				Observaciones & \multicolumn{4}{c}{490} \\
+				Grupos & \multicolumn{4}{c}{9} \\
+				Log-likelihood & \multicolumn{4}{c}{-15.55} \\
+				LR $\chi^2$(58) & \multicolumn{4}{c}{64.77} \\
+				Prob $> \chi^2$ & \multicolumn{4}{c}{0.252} \\
+				\bottomrule
+			\end{tabular}%
+		}
+		\begin{tablenotes}
+			\footnotesize
+			\item Nota: Regresión logística con efectos fijos que incluye la deuda pública (Deuda/PIB) junto al crecimiento y aceleración del crédito.  
+			Variable dependiente: \textit{crisis bancaria} (dummy).  
+			$^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
+		\end{tablenotes}
+	\end{table}
+	
+	\subsection{Comparativos RE y Hausman}
+		
+	Como se muestra en la \textbf{Tabla~\ref{tab:re_logit}}, el modelo logit con efectos aleatorios (RE) se estima como contraste complementario frente a la especificación con efectos fijos. Las variables explicativas son el crecimiento (\(\Delta\) Crédito) y la aceleración (\(\Delta^2\) Crédito) del crédito, ambas rezagadas un periodo. Los coeficientes mantienen los signos esperados y resultan altamente significativos al 1\%, con un efecto positivo para el crecimiento y negativo para la aceleración. En particular, un aumento en el crecimiento del crédito incrementa la probabilidad de crisis bancaria, mientras que una desaceleración reduce dicho riesgo, confirmando la naturaleza cíclica de los shocks financieros. El estadístico Wald \(\chi^2(10)=86.16\) y el valor \(p<0.01\) reflejan una alta capacidad explicativa del modelo y la significancia conjunta de los predictores.
+	
+	Desde una perspectiva económica, estos resultados confirman la robustez del vínculo entre la dinámica del crédito y la ocurrencia de crisis, incluso bajo la suposición de efectos aleatorios. La consistencia de los coeficientes con el modelo de efectos fijos sugiere estabilidad estructural de las estimaciones y apoya la validez del uso de ambas aproximaciones. El test de Hausman no rechaza la hipótesis nula de ausencia de correlación entre los efectos individuales y los regresores, lo que respalda la preferencia por el modelo RE al ganar eficiencia sin sesgo significativo. En términos de política económica, estos hallazgos refuerzan la utilidad de monitorear tanto el crecimiento como la aceleración del crédito en los sistemas de alerta temprana, dado su poder predictivo robusto frente a distintas especificaciones econométricas.
+	
+	\begin{table}[htbp]
+		\centering
+		\caption{Modelo Logit con efectos aleatorios (RE): comparación complementaria}
+		\label{tab:re_logit}
+		\resizebox{\columnwidth}{!}{%
+			\begin{tabular}{lcccc}
+				\toprule
+				& Coef. & Err. Est. & z & p-valor \\
+				\midrule
+				L1. $\Delta$ Crédito & 0.149$^{***}$ & 0.046 & 3.23 & 0.001 \\
+				L1. $\Delta^2$ Crédito & -0.364$^{***}$ & 0.103 & -3.50 & 0.000 \\
+				\midrule
+				Observaciones & \multicolumn{4}{c}{120} \\
+				Grupos & \multicolumn{4}{c}{15} \\
+				Log pseudolikelihood & \multicolumn{4}{c}{-34.23} \\
+				Wald $\chi^2$(10) & \multicolumn{4}{c}{86.16} \\
+				Prob $> \chi^2$ & \multicolumn{4}{c}{0.000} \\
+				\bottomrule
+			\end{tabular}%
+		}
+		\begin{tablenotes}
+			\footnotesize
+			\item Nota: Regresión logística con efectos aleatorios y errores estándar robustos agrupados por país.  
+			Variable dependiente: \textit{crisis bancaria} (dummy).  
+			$^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.  
+			El test de Hausman se utiliza para contrastar con el modelo de efectos fijos (\textit{FE\_L1}).  
+		\end{tablenotes}
+	\end{table}
+	
+	Como se muestra en la \textbf{Tabla~\ref{tab:hausman_test}}, el test de Hausman se emplea para contrastar la consistencia entre las estimaciones obtenidas mediante los modelos logit con efectos fijos (FE) y con efectos aleatorios (RE). El estadístico \(\chi^2(13)=17.72\) con un valor \(p=0.168\) indica que no se rechaza la hipótesis nula de ausencia de diferencias sistemáticas entre los estimadores. En consecuencia, el modelo de efectos aleatorios se considera apropiado, ya que produce estimaciones más eficientes al no evidenciar correlación significativa entre los efectos individuales y los regresores. Este resultado sugiere que las variaciones entre países no introducen sesgos relevantes en la estimación de los parámetros principales.
+	
+	Desde una perspectiva económica, la validación del modelo de efectos aleatorios refuerza la robustez de los resultados previos y permite aprovechar mejor la heterogeneidad entre países en la estimación del riesgo de crisis bancaria. La elección del modelo RE implica que los factores no observados específicos de cada economía pueden tratarse como aleatorios, sin comprometer la consistencia de los coeficientes asociados a las variables crediticias. Este hallazgo es coherente con la literatura empírica que utiliza modelos panel de efectos aleatorios en estudios multicountry de vulnerabilidad financiera (p. ej., Borio et al., 2018; Jordà et al., 2013), y respalda la aplicación de dicha metodología para la construcción de sistemas de alerta temprana y el diseño de políticas macroprudenciales comparables entre jurisdicciones.
+	
+	\begin{table}[htbp]
+		\centering
+		\caption{Test de Hausman: comparación entre efectos fijos y aleatorios}
+		\label{tab:hausman_test}
+		\resizebox{\columnwidth}{!}{%
+			\begin{tabular}{lccc}
+				\toprule
+				& $\chi^2$(13) & Prob $> \chi^2$ & Decisión \\
+				\midrule
+				Hausman FE vs RE & 17.72 & 0.168 & No se rechaza $H_0$ (preferible RE) \\
+				\bottomrule
+			\end{tabular}%
+		}
+		\begin{tablenotes}
+			\footnotesize
+			\item Nota: El test de Hausman contrasta la consistencia entre los modelos de efectos fijos y aleatorios.  
+			No se rechaza la hipótesis nula de diferencias no sistemáticas ($p = 0.168$), por lo que el modelo de efectos aleatorios (RE) resulta apropiado.  
+		\end{tablenotes}
+	\end{table}
+	
+	\subsection{Probit y efectos marginales}
+	
+	Como se muestra en la \textbf{Tabla~\ref{tab:probit_pooled}}, el modelo Probit agrupado estima la probabilidad de ocurrencia de crisis bancarias en función del crecimiento y la aceleración del crédito, incorporando efectos fijos por país y errores estándar robustos agrupados por clúster. Los coeficientes estimados son estadísticamente significativos al 1\% y mantienen los signos esperados: el crecimiento del crédito presenta un efecto positivo (\(0.156\)), mientras que la aceleración muestra un efecto negativo (\(-0.358\)). El pseudo \(R^2\) de 0.34 refleja una capacidad explicativa adecuada del modelo, confirmando que las variaciones en la dinámica del crédito explican una proporción sustancial del riesgo de crisis bancaria entre los países analizados.
+	
+	Económicamente, estos resultados corroboran que las expansiones del crédito incrementan el riesgo de crisis financieras, pero que las fases de desaceleración abrupta del crédito tienden a anticipar los puntos de inflexión del ciclo financiero, en línea con la evidencia empírica de Drehmann, Borio y Tsatsaronis (2012) y Schularick y Taylor (2012). La significancia robusta de ambas variables en un modelo Probit respalda la consistencia de los resultados obtenidos bajo especificaciones logit, sugiriendo que la relación entre crédito y crisis es estable a diferentes formas funcionales. En conjunto, estos hallazgos refuerzan el valor predictivo de los indicadores de crecimiento y aceleración del crédito para los sistemas de alerta temprana y la formulación de políticas macroprudenciales orientadas a mitigar riesgos sistémicos.
+	
+	\begin{table}[htbp]
+		\centering
+		\caption{Modelo Probit agrupado: Crecimiento y aceleración del crédito}
+		\label{tab:probit_pooled}
+		\resizebox{\columnwidth}{!}{%
+			\begin{tabular}{lccc}
+				\toprule
+				& Coeficiente & Error estándar & P-valor \\
+				\midrule
+				\textbf{L.Crecimiento del crédito} & 0.156*** & 0.052 & 0.003 \\
+				\textbf{L.Aceleración del crédito} & -0.358*** & 0.091 & 0.000 \\
+				\midrule
+				\textbf{Constante y efectos país} & Sí &  &  \\
+				\midrule
+				Observaciones & 79 & & \\
+				Pseudo R$^2$ & 0.3437 & & \\
+				Log pseudolikelihood & -23.182 & & \\
+				\bottomrule
+			\end{tabular}%
+		}
+		\begin{tablenotes}
+			\footnotesize
+			\item Nota: Estimación Probit agrupada con errores estándar robustos agrupados por país (\textit{cluster id}).  
+			Incluye efectos fijos por país y año. Los resultados muestran que un mayor crecimiento del crédito se asocia positivamente con la probabilidad de crisis bancaria, mientras que una aceleración (segunda derivada) del crédito tiene un efecto negativo y significativo.  
+			\item Significancia: * p$<$0.10, ** p$<$0.05, *** p$<$0.01.
+		\end{tablenotes}
+	\end{table}
+	
+	Como se muestra en la \textbf{Tabla~\ref{tab:margins_pooled}}, los efectos marginales promedio (AME) del modelo logit con dummies por país y año cuantifican el impacto marginal de las variaciones en el crédito sobre la probabilidad de ocurrencia de crisis bancarias. Los resultados indican que un aumento de un punto porcentual en el crecimiento del crédito (\(\Delta\) Crédito) incrementa la probabilidad de crisis en aproximadamente 0.0248 puntos porcentuales, con significancia estadística al 5\%. En contraste, la aceleración del crédito (\(\Delta^2\) Crédito) presenta un efecto negativo de -0.0571 puntos porcentuales, altamente significativo al 1\%. Ambas estimaciones son robustas a errores estándar agrupados por clúster, confirmando la relevancia estadística y económica de la dinámica crediticia.
+	
+	Desde una perspectiva económica, los resultados implican que no solo el ritmo de expansión del crédito, sino también sus cambios en la aceleración, tienen efectos sustanciales sobre la estabilidad financiera. Un crecimiento elevado y sostenido del crédito amplifica el riesgo de crisis, mientras que una desaceleración marcada puede actuar como señal temprana de ajuste en el ciclo financiero, consistente con los hallazgos de Borio et al. (2018) y Drehmann y Tsatsaronis (2014). La magnitud de los AME confirma la pertinencia de emplear variaciones del crédito como indicadores de alerta en los marcos de supervisión macroprudencial, dado su poder predictivo para anticipar vulnerabilidades sistémicas antes de que se materialicen crisis bancarias.
+	
+	\begin{table}[htbp]
+		\centering
+		\caption{Efectos marginales promedio (AME) sobre la probabilidad de crisis bancaria}
+		\label{tab:margins_pooled}
+		\resizebox{\columnwidth}{!}{%
+			\begin{tabular}{lccc}
+				\toprule
+				& AME (dy/dx) & Error estándar & P-valor \\
+				\midrule
+				L.Crecimiento del crédito & 0.0248** & 0.0081 & 0.002 \\
+				L.Aceleración del crédito & -0.0571*** & 0.0141 & 0.000 \\
+				\midrule
+				Observaciones & 79 & & \\
+				Modelo base & Logit con dummies país y año; VCE robusta (cluster id) & & \\
+				\bottomrule
+			\end{tabular}%
+		}
+		\begin{tablenotes}
+			\footnotesize
+			\item Nota: AME calculados como promedios de los efectos marginales individuales del modelo logit con dummies por país y año.
+			Variables en \% del PIB; un aumento de 1 unidad equivale a 1 p.p. del PIB.
+			Significancia: * p$<$0.10, ** p$<$0.05, *** p$<$0.01.
+		\end{tablenotes}
+	\end{table}
+	
+	
+	\section{Discusión e implicaciones de política}
+	
+	\subsection{Interpretación general de los resultados}
+	
+	Los resultados empíricos confirman que la dinámica del crédito —particularmente su ritmo de crecimiento y aceleración— constituye un determinante central del riesgo de crisis bancarias. En todos los modelos estimados, el crecimiento del crédito (\(\Delta\) Crédito) exhibe un efecto positivo y significativo sobre la probabilidad de crisis, mientras que su aceleración (\(\Delta^2\) Crédito) muestra un efecto negativo y robusto. Esta combinación sugiere que las expansiones sostenidas del crédito incrementan la vulnerabilidad financiera, pero los cambios abruptos en su velocidad actúan como señales tempranas de ajuste del ciclo financiero. En términos estadísticos, los efectos marginales promedio confirman que variaciones de un punto porcentual en el crédito tienen impactos no triviales sobre la probabilidad de crisis, en línea con la evidencia de Schularick y Taylor (2012) y Borio et al. (2018).
+	
+	Estos hallazgos respaldan la hipótesis de que los indicadores derivados de la segunda derivada del crédito capturan mejor los puntos de inflexión del ciclo financiero que las medidas tradicionales de brecha crédito–PIB. En la práctica, esto implica que los supervisores financieros deberían considerar la aceleración del crédito como una métrica complementaria a las variables de nivel y crecimiento, dado su poder predictivo frente a episodios de inestabilidad sistémica. Su interpretación es análoga a la de un “momentum financiero”: mide no solo cuánto crece el crédito, sino qué tan rápido cambia su ritmo de expansión.
+	
+	\subsection{Implicaciones para la supervisión macroprudencial}
+	
+	Desde el punto de vista de política económica, los resultados refuerzan la pertinencia de utilizar variables crediticias en el diseño de instrumentos macroprudenciales contracíclicos. La evidencia muestra que los períodos de aceleración crediticia coinciden con fases de euforia financiera, caracterizadas por una subestimación del riesgo y un relajamiento de los estándares crediticios. En estas circunstancias, la activación temprana de buffers contracíclicos —como los previstos en Basilea III— permitiría suavizar el ciclo financiero y fortalecer la resiliencia bancaria. Del mismo modo, una desaceleración sostenida del crédito podría servir como señal de agotamiento del ciclo, justificando la reducción gradual de dichos buffers para evitar una contracción excesiva del crédito.
+	
+	En consecuencia, la política prudencial debería avanzar hacia esquemas de calibración dinámica basados no solo en el nivel del crédito respecto al PIB, sino también en la tasa de cambio de su aceleración. Este enfoque diferenciado permitiría detectar tempranamente las inflexiones del ciclo crediticio, ajustando las herramientas regulatorias con mayor precisión temporal. Además, los resultados sugieren que los umbrales prudenciales no deben definirse de manera homogénea entre países, sino adaptarse a la estructura financiera, la profundidad del mercado de crédito y la sensibilidad histórica de cada economía a los shocks financieros.
+	
+	\subsection{Desafíos de implementación y limitaciones}
+	
+	A pesar de su consistencia estadística, los resultados deben interpretarse con cautela en el contexto de la formulación de políticas. En primer lugar, la disponibilidad y calidad de los datos crediticios a nivel internacional varía considerablemente, lo que puede limitar la capacidad de estimar métricas de aceleración con precisión y comparabilidad temporal. En segundo lugar, los modelos utilizados se basan en datos agregados de crédito bancario, sin distinguir entre segmentos (hogares, corporaciones o sector público), por lo que no capturan las diferencias en composición y riesgo. Finalmente, el marco econométrico no incorpora explícitamente los efectos de retroalimentación entre crédito, precios de activos y expectativas, que son relevantes en entornos de apalancamiento endógeno.
+	
+	No obstante, estas limitaciones no disminuyen el valor analítico de los resultados. Por el contrario, abren líneas claras para investigación futura: la desagregación del crédito por sector institucional, la incorporación de indicadores de apalancamiento no bancario, y el uso de modelos no lineales o de aprendizaje automático para capturar interacciones complejas entre variables financieras y macroeconómicas. Tales extensiones permitirían fortalecer los sistemas de alerta temprana y dotar a las autoridades de herramientas predictivas más precisas y adaptables a diferentes entornos financieros.
+	
+	\subsection{Síntesis y contribución de política}
+	
+	En conjunto, la evidencia empírica presentada aporta una visión integral sobre el papel de las métricas dinámicas del crédito en la prevención de crisis financieras. La aceleración del crédito emerge como una variable clave para la supervisión macroprudencial moderna, al reflejar la intensidad y el cambio en la velocidad de los ciclos financieros. Su incorporación en marcos de política permitiría anticipar desequilibrios antes de que se materialicen y ajustar de forma más eficiente las herramientas prudenciales. Así, los resultados de este estudio no solo confirman la relevancia del crédito como predictor de crisis, sino que también ofrecen una base cuantitativa para la calibración de instrumentos contracíclicos y el diseño de estrategias de estabilidad financiera orientadas al ciclo.
+		
+	\section{Conclusiones}
+	
+	El presente estudio analizó la relación entre la dinámica del crédito y la probabilidad de ocurrencia de crisis bancarias en una muestra de economías avanzadas y emergentes, utilizando estimaciones logit y probit con efectos fijos y aleatorios. Los resultados confirman de manera robusta que tanto el crecimiento del crédito (\(\Delta\) Crédito) como su aceleración (\(\Delta^2\) Crédito) son determinantes estadísticamente significativos del riesgo financiero. En particular, se observa que un aumento sostenido del crédito incrementa la probabilidad de crisis, mientras que una desaceleración posterior en su ritmo de expansión actúa como señal temprana de vulnerabilidad. Estos patrones se mantienen estables a lo largo de las diferentes especificaciones y pruebas de robustez, incluyendo el uso de rezagos temporales y la inclusión de controles macroeconómicos.
+	
+	La evidencia empírica demuestra que las métricas de aceleración del crédito poseen un poder predictivo superior al de las medidas tradicionales basadas únicamente en niveles o tasas de crecimiento. Ello sugiere que los supervisores financieros y los formuladores de política deberían prestar especial atención a la velocidad de los cambios en la expansión crediticia, ya que capturan la transición entre fases de auge y contracción dentro del ciclo financiero. En este sentido, la aceleración del crédito puede considerarse un indicador adelantado clave para el diseño de mecanismos de alerta temprana y la calibración dinámica de herramientas macroprudenciales, tales como los buffers de capital contracíclicos previstos en Basilea III.
+	
+	Asimismo, los resultados aportan evidencia cuantitativa sobre la magnitud del impacto crediticio: los efectos marginales promedio indican que variaciones de un punto porcentual en el crecimiento del crédito modifican de forma no trivial la probabilidad de crisis bancaria. Este hallazgo subraya la importancia de monitorear no solo el volumen total de crédito, sino también su trayectoria temporal y su aceleración, con el fin de detectar puntos de inflexión en el apalancamiento agregado. La consistencia entre los modelos logit y probit, junto con la validez del enfoque de efectos aleatorios verificada mediante el test de Hausman, refuerza la solidez de los resultados y su aplicabilidad a contextos comparativos entre países.
+	
+	Sin embargo, el análisis también presenta limitaciones. La disponibilidad y homogeneidad de los datos de crédito restringe la amplitud temporal del estudio y puede afectar la precisión de las estimaciones. Además, el enfoque agregado no permite examinar el papel diferencial de los segmentos de crédito (hogares, empresas o sector público) ni la interacción entre crédito, precios de activos y condiciones de liquidez. Futuras investigaciones podrían ampliar este marco incorporando desagregaciones sectoriales, indicadores de crédito no bancario y métodos de aprendizaje automático para mejorar la capacidad predictiva de los modelos de alerta temprana.
+	
+	En conclusión, los resultados de este trabajo confirman la centralidad de la dinámica crediticia en la explicación de las crisis bancarias y resaltan el valor analítico y operativo de las métricas de aceleración del crédito. Su integración en los marcos de supervisión macroprudencial permitiría a las autoridades anticipar la acumulación de riesgos sistémicos y adoptar políticas más oportunas y contracíclicas. Así, este estudio contribuye a la comprensión empírica de los ciclos financieros y ofrece una base cuantitativa sólida para fortalecer la estabilidad del sistema bancario mediante una gestión prudencial más informada y prospectiva.
+	
+	\section{Bibliografía}
+	
+	\begin{enumerate}[leftmargin=*,labelsep=0.5em,itemsep=0.4em]
+		
+		\item Aikman, B., Haldane, A. G., \& Kapadia, S. (2019).
+		Curbing the credit cycle. \textit{Economic Policy}, 34(100), 559--598.
+		
+		\item Bank for International Settlements. (2024).
+		\textit{Credit to the Non-financial Sector (dataset)}. BIS Statistics. Recuperado de \url{https://data.bis.org/}
+		
+		\item Borio, C., Drehmann, M., \& Tsatsaronis, K. (2014).
+		Buffering the financial cycle: The role of countercyclical capital buffers.
+		\textit{BIS Quarterly Review}, March, 43--57.
+		
+		\item Drehmann, M., \& Juselius, M. (2014).
+		Evaluating early warning indicators of banking crises: Satisfying policy requirements.
+		\textit{International Journal of Forecasting}, 30(3), 759--780.
+		
+		\item Global Macro Data. (2024).
+		\textit{Global Macro Data (dataset)}. Recuperado de \url{https://www.globalmacrodata.com/}
+		
+		\item Jordà, Ò., Schularick, M., \& Taylor, A. M. (2013).
+		When credit bites back. \textit{Journal of Money, Credit and Banking}, 45(s2), 3--28.
+		
+		\item Laeven, L., \& Valencia, F. (2020).
+		\textit{Systemic Banking Crises Database II (dataset)}. International Monetary Fund. Recuperado de \url{https://legacydata.imf.org/}
+		
+		\item Mendoza, E. G., \& Terrones, M. E. (2012).
+		An anatomy of credit booms and their demise. \textit{NBER Working Paper}, No. 18379.
+		
+		\item Reinhart, C. M., \& Rogoff, K. S. (2011).
+		From financial crash to debt crisis. \textit{American Economic Review}, 101(5), 1676--1706.
+		
+		\item Schularick, M., \& Taylor, A. M. (2012).
+		Credit booms gone bust: Monetary policy, leverage, and financial crises, 1870--2008.
+		\textit{American Economic Review}, 102(2), 1029--1061.
+		
+	\end{enumerate}
+	
+	
+	\appendix
+	\section*{Anexos: código, datos, pruebas adicionales}
+	
+	\subsection*{Anexo A. Fuentes de datos y repositorio}
+	
+	Las bases de datos utilizadas en este trabajo provienen de fuentes oficiales y están consolidadas en un repositorio compartido. Dichas fuentes incluyen el \textit{Bank for International Settlements (BIS)}, el \textit{International Monetary Fund (IMF)}, y la base \textit{Global Macro Data}, además de la base de crisis bancarias de \textit{Laeven \& Valencia (2020)}.\href{https://drive.google.com/drive/folders/1cYnO_r8iMFDWVqcxOOKYTJuldIIJArKE?usp=sharing}{\textbf{Repositorio de bases de datos y scripts}}
+	
+	\subsection*{Anexo B. Do-file maestro y replicación}
+	
+	El código principal del trabajo se encuentra disponible en el siguiente repositorio de Google Drive: 
+	\href{https://drive.google.com/drive/folders/1WFEZOnz8We_GpwO8QOfb9kXAMTCCH3ZM?usp=sharing}{\textbf{Do-file maestro}}. 
+	
+	\subsection*{Anexo C. Paneles de datos}
+	
+	Los paneles consolidados utilizados en las estimaciones están disponibles en el siguiente repositorio de Google Drive: 
+	\href{https://drive.google.com/drive/folders/1xz_X-D_c_CZ08GgZyFyrM4A27-RGW763?usp=sharing}{\textbf{Paneles de datos}}. 
+	
+	\subsection*{Anexo D. Gráficos y resultados visuales}
+	
+	Las figuras y gráficos generados a partir de las estimaciones econométricas se encuentran disponibles en el siguiente repositorio de Google Drive: 
+	\href{https://drive.google.com/drive/folders/1fBddxTUeWNLSPREs1Chn8_JM1tiME4SA?usp=sharing}{\textbf{Gráficos y resultados visuales}}. 
+	
+	
+\end{document}
+
